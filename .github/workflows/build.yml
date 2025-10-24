@@ -1,0 +1,77 @@
+name: Build ChromiumOS Stage3 using Github Actions
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - 'README.md'
+      - 'BUILDING.md'
+concurrency:
+  group: environment-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-chromiumos-stage3:
+    name: Build ChromiumOS Stage3
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+      - name: Display disk space
+        run: |
+          echo "Free space:"
+          df -h
+      - name: Free some disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo apt clean
+      - name: Checkout ChromiumOS Stage3 source code
+        uses: actions/checkout@v4
+      - name: Build ChromiumOS Stage3
+        run: sudo ./build.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromiumos-stage3-build
+          path: chromiumos_stage3.tar.gz
+          if-no-files-found: error
+  release:
+    name: Make a ChromiumOS Stage3 release
+    permissions:
+      contents: write
+    needs: build-chromiumos-stage3
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+      - name: Display disk space
+        run: |
+          echo "Free space:"
+          df -h
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: chromiumos-stage3-build
+      - name: Generate release details
+        run: |
+          RELEASE_FILE=$(ls chromiumos_stage3_*.tar.gz)
+          RELEASE_DATE=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f3)
+          echo "Found ChromiumOS Stage3 release: ${RELEASE_FILE} with date ${RELEASE_DATE}"
+          echo "RELEASE_FILE=chromiumos_stage3_${RELEASE_DATE}.tar.gz" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${RELEASE_DATE}" >> $GITHUB_ENV
+          echo "RELEASE_NAME=ChromiumOS Stage3 ${RELEASE_DATE}" >> $GITHUB_ENV
+          echo "RELEASE_SHA256=$(sha256sum chromiumos_stage3_${RELEASE_DATE}.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+      - name: Create a release and upload artifacts as assets
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.RELEASE_FILE }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          tag: "${{ env.RELEASE_TAG }}"
+          name: "${{ env.RELEASE_NAME }}"
+          commit: "${{ github.ref_name }}"
+          body: "${{ github.event.head_commit.message }}\n\nrelease_sha256sum=${{ env.RELEASE_SHA256 }}\n"
