@@ -8,8 +8,6 @@ export LC_ALL=C
 export HOME=/root
 mkdir -p $HOME
 
-env
-
 echo -e 'FEATURES="getbinpkg"' >> /etc/portage/make.conf
 emerge-webrsync
 getuto
@@ -65,7 +63,7 @@ sed -i '/features\/llvm/d' /var/db/repos/chromiumos/profiles/default/linux/amd64
 ln -s /var/db/repos/chromiumos/profiles/default/linux/amd64/$chromeos_profile_version/chromeos /etc/portage/make.profile
 sed -i '/^FEATURES=/d' /etc/portage/make.conf
 cat >>/etc/portage/make.conf <<'MAKEDEFAULTS'
-FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug"
+FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -splitdebug"
 GENTOO_MIRRORS="https://storage.googleapis.com/chromeos-mirror/gentoo"
 USE="-debug -doc -llvm_pgo_use -pam -pgo_use -test -thinlto"
 CROS_ARTIFACTS_TMP_DIR="/tmp/cros_artifacts"

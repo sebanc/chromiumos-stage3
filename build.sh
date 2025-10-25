@@ -25,7 +25,7 @@ mount -t tmpfs -o mode=1777 none ./chroot/dev/shm
 
 cp ./stage1 ./chroot/init
 cp ./stage2 ./chroot/stage2
-PATH=/usr/sbin:/usr/bin:sbin:/bin chromeos_short_version=$chromeos_short_version chroot ./chroot /init
+env -i PATH=/usr/sbin:/usr/bin:sbin:/bin chromeos_short_version=$chromeos_short_version chroot ./chroot /init
 
 for ROOT in $(find /proc/*/root 2>/dev/null); do
 	LINK="$(readlink -f ${ROOT})"
