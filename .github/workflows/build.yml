@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: chromiumos-stage3-build
-          path: chromiumos_stage3.tar.gz
+          path: chromiumos_stage3_*.tar.gz
           if-no-files-found: error
   release:
     name: Make a ChromiumOS Stage3 release
