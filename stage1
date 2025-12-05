@@ -75,8 +75,6 @@ echo -e 'sys-libs/libxcrypt static-libs' > /etc/portage/profile/package.use/libx
 #echo 'sys-devel/gcc -multilib' > /etc/portage/profile/package.use.force/gcc
 rm -r /var/db/pkg
 
-bash
-
 USE="headers-only" emerge --nodeps sys-devel/gcc sys-devel/automake dev-lang/python sys-libs/glibc sys-devel/binutils dev-libs/gmp dev-libs/mpfr dev-libs/mpc dev-libs/libffi sys-devel/gcc dev-build/libtool sys-libs/libsepol sys-libs/libselinux sys-libs/ncurses
 . /etc/profile
 mv /var/db/repos/chromiumos/profiles/base/profile.bashrc.tmp /var/db/repos/chromiumos/profiles/base/profile.bashrc
