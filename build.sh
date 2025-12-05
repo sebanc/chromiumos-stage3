@@ -12,7 +12,7 @@ if [ ! -f gentoo-stage3-amd64-openrc.tar.xz ]; then
 fi
 tar xf ./gentoo-stage3-amd64-openrc.tar.xz -C ./chroot
 
-echo 'nameserver 1.1.1.1' > ./chroot/etc/resolv.conf
+echo 'nameserver 8.8.8.8' > ./chroot/etc/resolv.conf
 
 mount -t proc none ./chroot/proc
 mount --bind -o ro /sys ./chroot/sys
