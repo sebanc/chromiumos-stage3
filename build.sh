@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-chromeos_short_version=R142
+chromeos_short_version=R143
 
 rm -rf ./chroot
 mkdir ./chroot
