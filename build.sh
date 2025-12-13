@@ -21,6 +21,7 @@ repo sync -j4
 REPO_INIT
 
 cd ./build_env/chromiumos
+export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
 
 cros_sdk <<COMMANDS
 set -e
