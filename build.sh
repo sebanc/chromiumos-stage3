@@ -16,7 +16,7 @@ mkdir -p ./build_env/chromiumos
 cd ./build_env/chromiumos
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ../depot_tools
 export PATH=$(echo \${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:\${PATH}
-repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} -g minilayout < /dev/null
+repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} < /dev/null
 repo sync -j4
 REPO_INIT
 
@@ -39,7 +39,6 @@ echo -e 'CXXFLAGS="-fexceptions -funwind-tables -fasynchronous-unwind-tables"\nC
 echo -e 'EXTRA_ECONF="-Dbyteorder=1234"' | sudo tee /build/reven/etc/portage/env/perl.conf
 emerge-${chromiumos_board} sys-apps/baselayout
 echo "root:x:0:0:root:/root:/bin/bash" | sudo tee /build/reven/etc/passwd
-emerge-${chromiumos_board} sys-devel/llvm
 emerge-${chromiumos_board} acct-user/chronos acct-group/chronos acct-group/root app-admin/sudo app-alternatives/awk app-alternatives/gzip app-editors/nano app-misc/ca-certificates app-misc/jq app-misc/mime-types app-shells/bash chromeos-base/vboot_reference dev-build/libtool dev-build/meson dev-lang/go dev-lang/perl dev-lang/python dev-lang/python-exec dev-lang/python-exec-conf dev-libs/json-glib dev-libs/libtasn1 dev-python/ensurepip-pip dev-python/ensurepip-setuptools dev-python/ensurepip-wheels dev-python/installer dev-python/packaging dev-python/setuptools dev-python/wheel dev-util/cmake dev-util/ninja dev-util/pkgconf dev-vcs/git media-libs/libjpeg-turbo media-libs/libpng net-misc/curl net-misc/rsync net-misc/wget sys-apps/attr sys-apps/coreutils sys-apps/diffutils sys-apps/file sys-apps/findutils sys-apps/flashrom sys-apps/gawk sys-apps/grep sys-apps/install-xattr sys-apps/locale-gen sys-apps/mawk sys-apps/sandbox sys-apps/sed sys-apps/shadow sys-apps/texinfo sys-apps/util-linux sys-boot/efibootmgr sys-devel/autoconf sys-devel/autoconf-wrapper sys-devel/automake sys-devel/automake-wrapper sys-devel/binutils sys-devel/binutils-config sys-devel/bison sys-devel/flex sys-devel/gcc sys-devel/gcc-config sys-devel/gnuconfig sys-devel/m4 sys-devel/make sys-devel/patch sys-fs/dosfstools sys-fs/ntfs3g sys-kernel/linux-headers sys-libs/libxcrypt sys-process/procps
 for i in  /build/reven/usr/x86_64-cros-linux-gnu/gcc-bin/*/*; do if [ "\$(readlink \${i})" == "host_wrapper" ]; then sudo rm "\${i}"; sudo ln -s "\$(basename \${i}).real" "\${i}"; fi; done
 sudo mkdir /build/reven/dev /build/reven/proc /build/reven/sys
