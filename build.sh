@@ -22,7 +22,7 @@ REPO_INIT
 
 cd ./build_env/chromiumos
 
-env -i PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH} cros_sdk <<COMMANDS
+cros_sdk <<COMMANDS
 set -e
 sudo emerge sys-devel/llvm
 setup_board --board=${chromiumos_board}
