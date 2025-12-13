@@ -15,6 +15,10 @@ jobs:
     name: Build ChromiumOS Stage3
     runs-on: ubuntu-24.04
     steps:
+      - name: Install dependencies
+        run: |
+          yes | DEBIAN_FRONTEND=noninteractive sudo apt update
+          yes | DEBIAN_FRONTEND=noninteractive sudo apt install git-core gitk git-gui curl lvm2 thin-provisioning-tools python3-pkg-resources python3-virtualenv python3-oauth2client xz-utils
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
@@ -58,13 +62,13 @@ jobs:
           name: chromiumos-stage3-build
       - name: Generate release details
         run: |
-          RELEASE_FILE=$(ls chromiumos_stage3_*.tar.gz)
-          RELEASE_DATE=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f3)
-          echo "Found ChromiumOS Stage3 release: ${RELEASE_FILE} with date ${RELEASE_DATE}"
-          echo "RELEASE_FILE=chromiumos_stage3_${RELEASE_DATE}.tar.gz" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${RELEASE_DATE}" >> $GITHUB_ENV
-          echo "RELEASE_NAME=ChromiumOS Stage3 ${RELEASE_DATE}" >> $GITHUB_ENV
-          echo "RELEASE_SHA256=$(sha256sum chromiumos_stage3_${RELEASE_DATE}.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+          RELEASE_FILE=$(ls chromiumos_stage3_r*.tar.gz)
+          RELEASE_VERSION=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f3)
+          RELEASE_DATE=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f4)
+          echo "Found ChromiumOS Stage3 release: ${RELEASE_FILE} with version ${RELEASE_VERSION} and date ${RELEASE_DATE}"
+          echo "RELEASE_TAG=${RELEASE_VERSION}-${RELEASE_DATE}" >> $GITHUB_ENV
+          echo "RELEASE_NAME=ChromiumOS Stage3 ${RELEASE_VERSION} ${RELEASE_DATE}" >> $GITHUB_ENV
+          echo "RELEASE_SHA256=$(sha256sum chromiumos_stage3_${RELEASE_VERSION}_${RELEASE_DATE}.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
       - name: Create a release and upload artifacts as assets
         uses: ncipollo/release-action@v1
         with:
