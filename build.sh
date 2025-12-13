@@ -16,7 +16,7 @@ mkdir -p ./build_env/chromiumos
 cd ./build_env/chromiumos
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ../depot_tools
 export PATH=$(echo \${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:\${PATH}
-repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} < /dev/null
+repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} -g minilayout < /dev/null
 repo sync -j4
 REPO_INIT
 
