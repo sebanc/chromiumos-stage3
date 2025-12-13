@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           yes | DEBIAN_FRONTEND=noninteractive sudo apt update
-          yes | DEBIAN_FRONTEND=noninteractive sudo apt install git-core gitk git-gui curl lvm2 thin-provisioning-tools python3-pkg-resources python3-virtualenv python3-oauth2client xz-utils
+          yes | DEBIAN_FRONTEND=noninteractive sudo apt install git-core curl lvm2 thin-provisioning-tools python3-pkg-resources python3-virtualenv python3-oauth2client xz-utils
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
