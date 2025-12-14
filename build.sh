@@ -8,22 +8,23 @@ chromiumos_long_version=$(git ls-remote https://chromium.googlesource.com/chromi
 
 chromiumos_board=reven
 
-rm -rf ./build_env
+sudo rm -rf ./build_env
 
-sudo -u ${SUDO_USER} bash <<REPO_INIT
-set -e
+#sudo -u ${SUDO_USER} bash <<REPO_INIT
+#set -e
 mkdir -p ./build_env/chromiumos
 cd ./build_env/chromiumos
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ../depot_tools
-export PATH=$(echo \${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:\${PATH}
+export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
+echo $PATH
 repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} -g minilayout < /dev/null
 repo sync -j4
-REPO_INIT
+#REPO_INIT
 
-cd ./build_env/chromiumos
-export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
+#cd ./build_env/chromiumos
+#export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
 
-sudo -u ${SUDO_USER} env "PATH=$PATH" cros_sdk <<COMMANDS
+env -i "HOME=$HOME" "PATH=$PATH" cros_sdk <<COMMANDS
 set -e
 setup_board --board=${chromiumos_board}
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.provided
