@@ -23,7 +23,7 @@ REPO_INIT
 cd ./build_env/chromiumos
 export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
 
-env -i HOME=${HOME} PATH=${PATH} cros_sdk <<COMMANDS
+env -i HOME=${HOME} PATH=${PATH} USER=${USER} XDG_CONFIG_HOME=${XDG_CONFIG_HOME} cros_sdk} <<COMMANDS
 set -e
 setup_board --board=${chromiumos_board}
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.provided
