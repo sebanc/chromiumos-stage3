@@ -31,7 +31,7 @@ sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chr
 sudo sed -i -z 's@local targetenv@local targetenv\n\treturn@g' /mnt/host/source/src/third_party/chromiumos-overlay/profiles/base/profile.bashrc
 sudo sed -i '/virtual\/perl-Math-BigInt/d' /mnt/host/source/src/third_party/portage-stable/dev-lang/perl/perl-*.ebuild
 sudo sed -i '/sys-libs\/glibc/!d' /build/reven/etc/portage/profile/package.provided
-echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -splitdebug"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-pam"' | sudo tee /build/reven/etc/portage/make.conf
+echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-pam"' | sudo tee /build/reven/etc/portage/make.conf
 sudo mkdir -p /build/reven/etc/portage/env /build/reven/etc/portage/profile
 echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /build/reven/etc/portage/profile/package.use
 echo -e 'dev-lang/perl perl.conf\ndev-util/cmake cmake.conf' | sudo tee /build/reven/etc/portage/package.env
