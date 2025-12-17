@@ -50,12 +50,14 @@ sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chr
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.mask
 sudo sed -i -z 's@local targetenv@local targetenv\n\treturn@g' /mnt/host/source/src/third_party/chromiumos-overlay/profiles/base/profile.bashrc
 sudo sed -i '/virtual\/perl-Math-BigInt/d' /mnt/host/source/src/third_party/portage-stable/dev-lang/perl/perl-*.ebuild
+echo -e '#!/bin/bash\nexec \$1' | sudo tee /mnt/host/source/src/platform2/common-mk/meson_test.py
 sudo sed -i '/sys-libs\/glibc/!d' /build/reven/etc/portage/profile/package.provided
-echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-pam"' | sudo tee /build/reven/etc/portage/make.conf
+echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
 sudo mkdir -p /build/reven/etc/portage/env /build/reven/etc/portage/profile
 echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /build/reven/etc/portage/profile/package.use
-echo -e 'dev-lang/perl perl.conf\ndev-util/cmake cmake.conf' | sudo tee /build/reven/etc/portage/package.env
+echo -e 'dev-lang/perl perl.conf\ndev-util/cmake cmake.conf\ndev-libs/glib glib.conf' | sudo tee /build/reven/etc/portage/package.env
 echo -e 'CXXFLAGS="-fexceptions -funwind-tables -fasynchronous-unwind-tables"\nCXXEXCEPTIONS=1' | sudo tee /build/reven/etc/portage/env/cmake.conf
+echo -e 'LDFLAGS="-Wl,-z,pack-relative-relocs"' | sudo tee /build/reven/etc/portage/env/glib.conf
 echo -e 'EXTRA_ECONF="-Dbyteorder=1234"' | sudo tee /build/reven/etc/portage/env/perl.conf
 emerge-${chromiumos_board} sys-apps/baselayout
 echo "root:x:0:0:root:/root:/bin/bash" | sudo tee /build/reven/etc/passwd
