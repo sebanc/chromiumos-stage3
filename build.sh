@@ -8,23 +8,42 @@ chromiumos_long_version=$(git ls-remote https://chromium.googlesource.com/chromi
 
 chromiumos_board=reven
 
-sudo rm -rf ./build_env
+rm -rf ./chroot
+mkdir ./chroot
+curl -L https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.zst -o /tmp/archlinux-bootstrap.tar.zst
+tar --zstd --strip 1 -xf /tmp/archlinux-bootstrap.tar.zst -C ./chroot
 
-#sudo -u ${SUDO_USER} bash <<REPO_INIT
-#set -e
+cat >./chroot/init <<CHROOT_INIT
+#!/bin/bash
+set -e
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+
+cur_speed=0; for i in https://geo.mirror.pkgbuild.com https://mirrors.rit.edu/archlinux https://archlinux.mirror.digitalpacific.com.au; do if ! avg_speed=\$(curl -fsS -m 5 -r 0-1048576 -w '%{speed_download}' -o /dev/null --url "\${i}/core/os/x86_64/core.db" 2> /dev/null); then avg_speed=0; fi; echo Download speed rating for mirror \${i} is \${avg_speed}; if [ \${avg_speed} -gt \${cur_speed} ]; then cur_speed=\${avg_speed}; default_mirror=\${i}; fi; done; echo Using mirror \${default_mirror}; sed -i "s@#Server = \${default_mirror}@Server = \${default_mirror}@g" /etc/pacman.d/mirrorlist
+
+pacman-key --init
+pacman-key --populate
+pacman -Syu --noconfirm --needed git openssh python sudo tar xz zstd
+
+useradd -s /bin/bash -m 'temp'
+echo -e 'temp\ntemp' | passwd 'temp'
+echo 'temp      ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/90-wheel
+cd /home/temp
+
+sudo -u temp bash << 'CHROOT_USER'
+set -e
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
 mkdir -p ./build_env/chromiumos
 cd ./build_env/chromiumos
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ../depot_tools
-export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
-echo $PATH
+export PATH=/home/temp/build_env/depot_tools:/usr/sbin:/usr/bin:/sbin:/bin
 repo init -u https://chromium.googlesource.com/chromiumos/manifest.git -b release-${chromiumos_long_version} -g minilayout < /dev/null
 repo sync -j4
-#REPO_INIT
 
-#cd ./build_env/chromiumos
-#export PATH=$(echo ${PWD})/../depot_tools:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}
-
-env -i "HOME=$HOME" "PATH=$PATH" cros_sdk <<COMMANDS
+cros_sdk <<'CHROMIUMOS_BUILD'
 set -e
 setup_board --board=${chromiumos_board}
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.provided
@@ -44,11 +63,27 @@ emerge-${chromiumos_board} acct-user/chronos acct-group/chronos acct-group/root 
 for i in  /build/reven/usr/x86_64-cros-linux-gnu/gcc-bin/*/*; do if [ "\$(readlink \${i})" == "host_wrapper" ]; then sudo rm "\${i}"; sudo ln -s "\$(basename \${i}).real" "\${i}"; fi; done
 sudo mkdir /build/reven/dev /build/reven/proc /build/reven/sys
 sudo rm -r /build/reven/build /build/reven/packages /build/reven/sys-include /build/reven/usr/local /build/reven/tmp/portage 
-COMMANDS
+CHROMIUMOS_BUILD
+CHROOT_USER
+CHROOT_INIT
+chmod 0755 ./chroot/init
 
-cd ../..
+unshare --mount --fork bash <<TEST
+set -e
+mount --bind ./chroot ./chroot
+mount -t proc none ./chroot/proc
+mount --bind -o ro /sys ./chroot/sys
+mount --bind /dev ./chroot/dev
+mount --bind /dev/pts ./chroot/dev/pts
+mount -t tmpfs -o mode=1777 none ./chroot/dev/shm
+mkdir ./chroot/old
+cd chroot
+pivot_root . ./old
+#pivot_root ./chroot ./chroot/old
+PATH=/usr/sbin:/usr/bin:/sbin:/bin exec env -i chroot . bash -c "umount -l /old && /init"
+TEST
 
 rm -f ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
-tar zcf ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz -C ./build_env/chromiumos/out/build/reven .
+tar zcf ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz -C ./chroot/home/temp/build_env/chromiumos/out/build/reven .
 chown ${SUDO_UID}:$(id -g ${SUDO_UID}) ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
 
