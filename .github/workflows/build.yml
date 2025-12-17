@@ -34,7 +34,7 @@ jobs:
       - name: Checkout ChromiumOS Stage3 source code
         uses: actions/checkout@v4
       - name: Build ChromiumOS Stage3
-        run: ./build.sh
+        run: sudo ./build.sh
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
