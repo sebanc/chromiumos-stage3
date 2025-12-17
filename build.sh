@@ -55,9 +55,8 @@ sudo sed -i '/sys-libs\/glibc/!d' /build/reven/etc/portage/profile/package.provi
 echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
 sudo mkdir -p /build/reven/etc/portage/env /build/reven/etc/portage/profile
 echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /build/reven/etc/portage/profile/package.use
-echo -e 'dev-lang/perl perl.conf\ndev-util/cmake cmake.conf\ndev-libs/glib glib.conf' | sudo tee /build/reven/etc/portage/package.env
+echo -e 'dev-util/cmake cmake.conf\ndev-lang/perl perl.conf' | sudo tee /build/reven/etc/portage/package.env
 echo -e 'CXXFLAGS="-fexceptions -funwind-tables -fasynchronous-unwind-tables"\nCXXEXCEPTIONS=1' | sudo tee /build/reven/etc/portage/env/cmake.conf
-echo -e 'LDFLAGS="-Wl,-z,pack-relative-relocs"' | sudo tee /build/reven/etc/portage/env/glib.conf
 echo -e 'EXTRA_ECONF="-Dbyteorder=1234"' | sudo tee /build/reven/etc/portage/env/perl.conf
 emerge-${chromiumos_board} sys-apps/baselayout
 echo "root:x:0:0:root:/root:/bin/bash" | sudo tee /build/reven/etc/passwd
