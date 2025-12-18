@@ -35,37 +35,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Build ChromiumOS Stage3
         run: sudo ./build.sh
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: chromiumos-stage3-build
-          path: chromiumos_stage3_*.tar.gz
-          if-no-files-found: error
-  release:
-    name: Make a ChromiumOS Stage3 release
-    permissions:
-      contents: write
-    needs: build-chromiumos-stage3
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-      - name: Display disk space
-        run: |
-          echo "Free space:"
-          df -h
-      - name: Download built artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: chromiumos-stage3-build
       - name: Generate release details
         run: |
           RELEASE_FILE=$(ls chromiumos_stage3_r*.tar.gz)
           RELEASE_VERSION=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f3)
           RELEASE_DATE=$(echo "$RELEASE_FILE" | cut -d'.' -f1 | cut -d'_' -f4)
           echo "Found ChromiumOS Stage3 release: ${RELEASE_FILE} with version ${RELEASE_VERSION} and date ${RELEASE_DATE}"
+          echo "RELEASE_FILE=${RELEASE_FILE}" >> $GITHUB_ENV
           echo "RELEASE_TAG=${RELEASE_VERSION}-${RELEASE_DATE}" >> $GITHUB_ENV
           echo "RELEASE_NAME=ChromiumOS Stage3 ${RELEASE_VERSION} ${RELEASE_DATE}" >> $GITHUB_ENV
           echo "RELEASE_SHA256=$(sha256sum chromiumos_stage3_${RELEASE_VERSION}_${RELEASE_DATE}.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
