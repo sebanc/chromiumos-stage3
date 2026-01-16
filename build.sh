@@ -2,7 +2,7 @@
 
 set -e
 
-chromiumos_short_version=R143
+chromiumos_short_version=R144
 
 chromiumos_long_version=$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/kernel/ | grep "refs/heads/release-${chromiumos_short_version}" | head -1 | sed -e 's#.*\t##' -e 's#chromeos-.*##' | sort -u | cut -d'-' -f2,3)
 
