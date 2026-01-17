@@ -46,6 +46,9 @@ repo sync -j4
 
 cros_sdk <<'CHROMIUMOS_BUILD'
 set -e
+rm -rf /mnt/host/source/src/platform/vboot_reference /mnt/host/source/src/aosp/external/avb
+git clone -b release-${chromiumos_long_version} https://chromium.googlesource.com/chromiumos/platform/vboot_reference /mnt/host/source/src/platform/vboot_reference
+git clone -b android16-release https://android.googlesource.com/platform/external/avb /mnt/host/source/src/aosp/external/avb
 setup_board --board=${chromiumos_board}
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.provided
 sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.mask
