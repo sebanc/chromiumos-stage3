@@ -60,7 +60,7 @@ sudo sed -i -z 's@local sysroot_wrapper_file=host_wrapper@return\n\t\tlocal sysr
 sudo sed -i '/virtual\/perl-Math-BigInt/d' /mnt/host/source/src/third_party/portage-stable/dev-lang/perl/perl-*.ebuild
 echo -e '#!/bin/bash\nexec \$1' | sudo tee /mnt/host/source/src/platform2/common-mk/meson_test.py
 sudo sed -i '/sys-libs\/glibc/!d' /build/reven/etc/portage/profile/package.provided
-echo -e 'FEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
+echo -e 'FEATURES="-buildpkg -ccache -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
 sudo mkdir -p /build/reven/etc/portage/env /build/reven/etc/portage/profile
 echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /build/reven/etc/portage/profile/package.use
 echo -e 'dev-util/cmake cmake.conf\ndev-lang/perl perl.conf' | sudo tee /build/reven/etc/portage/package.env
@@ -69,7 +69,6 @@ echo -e 'EXTRA_ECONF="-Dbyteorder=1234"' | sudo tee /build/reven/etc/portage/env
 emerge-${chromiumos_board} sys-apps/baselayout
 echo -e "root:x:0:0:root:/root:/bin/bash\nportage:x:250:250:portage:/var/tmp/portage:/bin/false" | sudo tee /build/reven/etc/passwd
 echo -e "portage::250:portage" | sudo tee /build/reven/etc/group
-sudo ln -s x86_64-cros-linux-gnu-cc /usr/bin/x86_64-cros-linux-gnu-cc.real
 emerge-${chromiumos_board} acct-user/chronos acct-group/chronos acct-group/root app-admin/sudo app-alternatives/awk app-alternatives/gzip app-arch/cpio app-editors/nano app-misc/ca-certificates app-misc/jq app-misc/mime-types app-shells/bash chromeos-base/vboot_reference dev-build/libtool dev-build/meson dev-debug/strace dev-lang/go dev-lang/perl dev-lang/python dev-lang/python-exec dev-lang/python-exec-conf dev-libs/json-glib dev-libs/libtasn1 dev-python/ensurepip-pip dev-python/ensurepip-setuptools dev-python/ensurepip-wheels dev-python/installer dev-python/packaging dev-python/setuptools dev-python/wheel dev-util/cmake dev-util/ninja dev-util/pkgconf dev-vcs/git media-libs/libjpeg-turbo media-libs/libpng net-misc/curl net-misc/rsync net-misc/wget sys-apps/attr sys-apps/coreutils sys-apps/diffutils sys-apps/file sys-apps/findutils sys-apps/flashrom sys-apps/gawk sys-apps/grep sys-apps/install-xattr sys-apps/locale-gen sys-apps/mawk sys-apps/sandbox sys-apps/sed sys-apps/shadow sys-apps/texinfo sys-apps/util-linux sys-boot/efibootmgr sys-devel/autoconf sys-devel/autoconf-wrapper sys-devel/automake sys-devel/automake-wrapper sys-devel/binutils sys-devel/binutils-config sys-devel/bison sys-devel/flex sys-devel/gcc sys-devel/gcc-config sys-devel/gdb sys-devel/gnuconfig sys-devel/m4 sys-devel/make sys-devel/patch sys-fs/dosfstools sys-fs/ntfs3g sys-kernel/linux-headers sys-libs/libxcrypt sys-process/procps
 sudo mkdir /build/reven/dev /build/reven/proc /build/reven/sys
 sudo rm -r /build/reven/etc/make.conf* /build/reven/build /build/reven/packages /build/reven/sys-include /build/reven/usr/local /build/reven/tmp/portage
@@ -81,7 +80,7 @@ sudo cp -r /mnt/host/source/src/third_party/eclass-overlay /build/reven/mnt/host
 sudo cp -r /mnt/host/source/src/third_party/portage-stable /build/reven/mnt/host/source/src/third_party/
 sudo cp -r /mnt/host/source/src/third_party/chromiumos-overlay /build/reven/mnt/host/source/src/third_party/
 echo -e '[chromiumos]\nlocation = /mnt/host/source/src/third_party/chromiumos-overlay\n\n[portage-stable]\nlocation = /mnt/host/source/src/third_party/portage-stable\n\n[eclass-overlay]\nlocation = /mnt/host/source/src/third_party/eclass-overlay' | sudo tee /build/reven/etc/portage/repos.conf
-echo -e 'CHOST="x86_64-cros-linux-gnu"\nFEATURES="-buildpkg -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nGENTOO_MIRRORS="https://storage.googleapis.com/chromeos-mirror/gentoo"\nPORTDIR="/var/cache"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
+echo -e 'CHOST="x86_64-cros-linux-gnu"\nFEATURES="-buildpkg -ccache -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nGENTOO_MIRRORS="https://storage.googleapis.com/chromeos-mirror/gentoo"\nPORTDIR="/var/cache"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
 echo -e 'sys-devel/gcc -multilib' | sudo tee /build/reven/etc/portage/profile/package.use.force
 echo -e 'chronos ALL=(ALL) NOPASSWD: ALL' | sudo tee /build/reven/etc/sudoers.d/95_cros_base
 CHROMIUMOS_BUILD
