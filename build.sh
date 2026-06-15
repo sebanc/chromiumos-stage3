@@ -33,7 +33,7 @@ echo -e 'temp\ntemp' | passwd 'temp'
 echo 'temp      ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/90-wheel
 cd /home/temp
 
-sudo -u temp bash << 'CHROOT_USER'
+cat >./reposync <<CHROOT_USER
 set -e
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
@@ -46,76 +46,19 @@ repo sync -j4
 
 cros_sdk <<'CHROMIUMOS_BUILD'
 set -e
-rm -rf /mnt/host/source/src/platform/vboot_reference /mnt/host/source/src/aosp/external/avb
-git clone -b release-${chromiumos_long_version} https://chromium.googlesource.com/chromiumos/platform/vboot_reference /mnt/host/source/src/platform/vboot_reference
-git clone -b android16-release https://android.googlesource.com/platform/external/avb /mnt/host/source/src/aosp/external/avb
-setup_board --board=${chromiumos_board}
-sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.provided
-sudo rm /mnt/host/source/src/third_party/chromiumos-overlay/profiles/targets/chromeos/package.mask
-sudo sed -i -z 's@local targetenv@local targetenv\n\treturn@g' /mnt/host/source/src/third_party/chromiumos-overlay/profiles/base/profile.bashrc
-sudo rm -f /mnt/host/source/src/third_party/chromiumos-overlay/sys-apps/sed/sed.bashrc
-sudo rm -f /mnt/host/source/src/third_party/chromiumos-overlay/sys-devel/bc/bc.bashrc
-sudo rm -f /mnt/host/source/src/third_party/chromiumos-overlay/sys-apps/mawk/mawk.bashrc
-sudo sed -i -z 's@local sysroot_wrapper_file=host_wrapper@return\n\t\tlocal sysroot_wrapper_file=host_wrapper@g' /mnt/host/source/src/third_party/chromiumos-overlay/sys-devel/gcc/gcc-*.ebuild
-sudo sed -i '/virtual\/perl-Math-BigInt/d' /mnt/host/source/src/third_party/portage-stable/dev-lang/perl/perl-*.ebuild
-echo -e '#!/bin/bash\nexec \$1' | sudo tee /mnt/host/source/src/platform2/common-mk/meson_test.py
-sudo sed -i '/sys-libs\/glibc/!d' /build/reven/etc/portage/profile/package.provided
-echo -e 'FEATURES="-buildpkg -ccache -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
-sudo mkdir -p /build/reven/etc/portage/env /build/reven/etc/portage/profile
-echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /build/reven/etc/portage/profile/package.use
-echo -e 'dev-util/cmake cmake.conf\ndev-lang/perl perl.conf' | sudo tee /build/reven/etc/portage/package.env
-echo -e 'CXXFLAGS="-fexceptions -funwind-tables -fasynchronous-unwind-tables"\nCXXEXCEPTIONS=1' | sudo tee /build/reven/etc/portage/env/cmake.conf
-echo -e 'EXTRA_ECONF="-Dbyteorder=1234"' | sudo tee /build/reven/etc/portage/env/perl.conf
-echo -e "root:x:0:0:root:/root:/bin/bash\nportage:x:250:250:portage:/var/tmp/portage:/bin/false" | sudo tee /build/reven/etc/passwd
-echo -e "portage::250:portage" | sudo tee /build/reven/etc/group
-emerge-${chromiumos_board} sys-apps/baselayout ccache
-emerge-${chromiumos_board} acct-user/chronos acct-group/chronos acct-group/root app-admin/sudo app-alternatives/awk app-alternatives/gzip app-arch/cpio app-editors/nano app-misc/ca-certificates app-misc/jq app-misc/mime-types app-shells/bash chromeos-base/vboot_reference dev-build/libtool dev-build/meson dev-debug/strace dev-lang/go dev-lang/perl dev-lang/python dev-lang/python-exec dev-lang/python-exec-conf dev-libs/json-glib dev-libs/libtasn1 dev-python/ensurepip-pip dev-python/ensurepip-setuptools dev-python/ensurepip-wheels dev-python/installer dev-python/packaging dev-python/setuptools dev-python/wheel dev-util/cmake dev-util/ninja dev-util/pkgconf dev-vcs/git media-libs/libjpeg-turbo media-libs/libpng net-misc/curl net-misc/rsync net-misc/wget sys-apps/attr sys-apps/coreutils sys-apps/diffutils sys-apps/file sys-apps/findutils sys-apps/flashrom sys-apps/gawk sys-apps/grep sys-apps/install-xattr sys-apps/locale-gen sys-apps/mawk sys-apps/sandbox sys-apps/sed sys-apps/shadow sys-apps/texinfo sys-apps/util-linux sys-boot/efibootmgr sys-devel/autoconf sys-devel/autoconf-wrapper sys-devel/automake sys-devel/automake-wrapper sys-devel/binutils sys-devel/binutils-config sys-devel/bison sys-devel/flex sys-devel/gcc sys-devel/gcc-config sys-devel/gdb sys-devel/gnuconfig sys-devel/m4 sys-devel/make sys-devel/patch sys-fs/dosfstools sys-fs/ntfs3g sys-kernel/linux-headers sys-libs/libxcrypt sys-process/procps
-sudo mkdir /build/reven/dev /build/reven/proc /build/reven/sys
-sudo rm -r /build/reven/etc/make.conf* /build/reven/build /build/reven/packages /build/reven/sys-include /build/reven/usr/local /build/reven/tmp/portage
-sudo sed -i '/features\/llvm/d' /mnt/host/source/src/third_party/chromiumos-overlay/profiles/default/linux/amd64/10.0/chromeos/parent
-sudo sed -i -z 's@eapply "\${WORKDIR}/patch"@eapply "\${WORKDIR}/patch"\n\teapply "\${FILESDIR}/libcpp-enable-nls.patch"@g' /mnt/host/source/src/third_party/chromiumos-overlay/sys-devel/gcc/gcc-*.ebuild
-sudo mkdir -p /build/reven/mnt/host/source/src/third_party
-sudo cp -r /mnt/host/source/src/overlays /build/reven/mnt/host/source/src/
-sudo cp -r /mnt/host/source/src/third_party/eclass-overlay /build/reven/mnt/host/source/src/third_party/
-sudo cp -r /mnt/host/source/src/third_party/portage-stable /build/reven/mnt/host/source/src/third_party/
-sudo cp -r /mnt/host/source/src/third_party/chromiumos-overlay /build/reven/mnt/host/source/src/third_party/
-echo -e '[chromiumos]\nlocation = /mnt/host/source/src/third_party/chromiumos-overlay\n\n[portage-stable]\nlocation = /mnt/host/source/src/third_party/portage-stable\n\n[eclass-overlay]\nlocation = /mnt/host/source/src/third_party/eclass-overlay' | sudo tee /build/reven/etc/portage/repos.conf
-echo -e 'CHOST="x86_64-cros-linux-gnu"\nFEATURES="-buildpkg -ccache -collision-detect -force-mirror -getbinpkg -protect-owned -sandbox -splitdebug -usersandbox"\nGENTOO_MIRRORS="https://storage.googleapis.com/chromeos-mirror/gentoo"\nPORTDIR="/var/cache"\nMAKEOPTS="--jobs 2"\nEMERGE_DEFAULT_OPTS="--jobs 2"\nUSE="-hardened -pam"' | sudo tee /build/reven/etc/portage/make.conf
-echo -e 'sys-devel/gcc -multilib' | sudo tee /build/reven/etc/portage/profile/package.use.force
-echo -e 'chronos ALL=(ALL) NOPASSWD: ALL' | sudo tee /build/reven/etc/sudoers.d/95_cros_base
+echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /etc/portage/profile/package.use
+sudo emerge dev-libs/json-glib sys-boot/efibootmgr sys-fs/ntfs3g sys-libs/libxcrypt
+qlist -I 'target-sdk-' | xargs qlist -I 'target-chromium-' | xargs qlist -I 'cross-' | xargs qlist -I 'app-emulation/qemu' | xargs qlist -I 'dev-util/intel_clc' | xargs qlist -I 'chromeos-base/pigweed-utils' | xargs qlist -I 'dev-util/hdctools' | xargs qlist -I 'dev-util/cros-hpt' | xargs qlist -I 'dev-util/test-services' | xargs qlist -I 'sys-devel/dex2oatds' | xargs qlist -I 'sys-boot/grub' | xargs qlist -I 'sys-devel/dex2oatds' | xargs qlist -I 'dev-lang/rust-bootstrap' | xargs qlist -I 'dev-go/u-root' | xargs sudo emerge --depclean --verbose
+qlist -I 'sys-devel/llvm' | xargs sudo emerge --unmerge
+sudo rm -rf /usr/lib64/cros_rust_registry /usr/share/doc
 CHROMIUMOS_BUILD
 CHROOT_USER
+chmod 0755 ./reposync
+sudo -u temp ./reposync
 
-mount -t proc none /home/temp/build_env/chromiumos/out/build/reven/proc
-mount --bind -o ro /sys /home/temp/build_env/chromiumos/out/build/reven/sys
-mount --make-slave /home/temp/build_env/chromiumos/out/build/reven/sys
-mount --bind /dev /home/temp/build_env/chromiumos/out/build/reven/dev
-mount --make-slave /home/temp/build_env/chromiumos/out/build/reven/dev
-mount --bind /dev/pts /home/temp/build_env/chromiumos/out/build/reven/dev/pts
-mount --make-slave /home/temp/build_env/chromiumos/out/build/reven/dev/pts
-mount -t tmpfs -o mode=1777 none /home/temp/build_env/chromiumos/out/build/reven/dev/shm
-mount -t tmpfs none /home/temp/build_env/chromiumos/out/build/reven/tmp
+sudo tar --exclude='mnt' --exclude='opt' -zcf ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz -C /home/temp/build_env/chromiumos/chroot .
 
-echo 'nameserver 8.8.8.8' > /home/temp/build_env/chromiumos/out/build/reven/etc/resolv.conf
-cat >/home/temp/build_env/chromiumos/out/build/reven/init <<'FINALIZE'
-#!/bin/bash
-
-set -e
-
-sudo emerge --nodeps sys-devel/binutils dev-libs/gmp dev-libs/mpfr dev-libs/mpc dev-libs/libffi sys-devel/gcc
-sudo emerge --nodeps dev-build/libtool
-sudo ln -sf gcc /usr/bin/cc
-FINALIZE
-chmod 0755 /home/temp/build_env/chromiumos/out/build/reven/init
-chroot --userspec=1000:1000 /home/temp/build_env/chromiumos/out/build/reven /init
-rm /home/temp/build_env/chromiumos/out/build/reven/etc/resolv.conf
-
-umount /home/temp/build_env/chromiumos/out/build/reven/tmp
-umount /home/temp/build_env/chromiumos/out/build/reven/dev/shm
-umount /home/temp/build_env/chromiumos/out/build/reven/dev/pts
-umount /home/temp/build_env/chromiumos/out/build/reven/dev
-umount /home/temp/build_env/chromiumos/out/build/reven/sys
-umount /home/temp/build_env/chromiumos/out/build/reven/proc
+#bash
 CHROOT_INIT
 chmod 0755 ./chroot/init
 
@@ -136,6 +79,8 @@ chmod 0755 ./chroot/bootstrap
 unshare --mount-proc --fork ./chroot/bootstrap
 
 rm -f ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
-tar zcf ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz -C ./chroot/home/temp/build_env/chromiumos/out/build/reven .
+mv ./chroot/home/temp/chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
+chmod 0644 ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
 chown ${SUDO_UID}:$(id -g ${SUDO_UID}) ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz
+ln -s ./chromiumos_stage3_$(echo ${chromiumos_short_version} | tr '[A-Z]' '[a-z]')_$(date +"%Y%m%d").tar.gz ./chromiumos_stage3.tar.gz
 
