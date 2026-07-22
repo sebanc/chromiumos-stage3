@@ -50,7 +50,7 @@ echo -e 'sys-libs/libxcrypt static-libs' | sudo tee /etc/portage/profile/package
 sudo emerge dev-libs/json-glib sys-boot/efibootmgr sys-fs/ntfs3g sys-libs/libxcrypt
 qlist -I 'target-sdk-' | xargs qlist -I 'target-chromium-' | xargs qlist -I 'cross-' | xargs qlist -I 'app-emulation/qemu' | xargs qlist -I 'dev-util/intel_clc' | xargs qlist -I 'chromeos-base/pigweed-utils' | xargs qlist -I 'dev-util/hdctools' | xargs qlist -I 'dev-util/cros-hpt' | xargs qlist -I 'dev-util/test-services' | xargs qlist -I 'sys-devel/dex2oatds' | xargs qlist -I 'sys-boot/grub' | xargs qlist -I 'sys-devel/dex2oatds' | xargs qlist -I 'dev-lang/rust-bootstrap' | xargs qlist -I 'dev-go/u-root' | xargs sudo emerge --depclean --verbose
 qlist -I 'sys-devel/llvm' | xargs sudo emerge --unmerge
-sudo rm -rf /usr/lib64/cros_rust_registry /usr/local/* /usr/share/doc
+sudo rm -rf /usr/lib64/cros_rust_registry /usr/share/doc
 CHROMIUMOS_BUILD
 CHROOT_USER
 chmod 0755 ./reposync
